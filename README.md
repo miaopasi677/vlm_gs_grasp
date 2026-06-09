@@ -83,3 +83,12 @@ chmod +x run_robot.sh
 **`roslaunch armpi_fpv display.launch` 找不到 launch**  
 → 先 `source devel/setup.bash`，或直接使用 `./run_display.sh`。
 # vlm_gs_grasp
+
+
+3dgs重建图示
+<img width="1912" height="962" alt="7ea3ce09844ddea410d34991c075956a" src="https://github.com/user-attachments/assets/b907509c-7715-48fc-bc80-89f80f5473cd" />
+rviz点云图示
+<img width="1920" height="1017" alt="794dcea90f63c04f9a555351606ec841" src="https://github.com/user-attachments/assets/558704ee-3fb6-4d33-be5a-d8039e98887e" />
+模拟抓取真机
+https://github.com/user-attachments/assets/bb7629d5-0f4e-42a3-9507-c9e99a2d38e3
+
