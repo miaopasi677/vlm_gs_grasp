@@ -1,0 +1,96 @@
+<launch>
+  <!-- 点云抓取: MoveIt + 点云检测 + 抓取
+
+       使用方式:
+         roslaunch armpi_fpv_moveit_config pointcloud_grasp.launch
+         roslaunch armpi_fpv_moveit_config pointcloud_grasp.launch mode:=interactive
+
+       参数:
+         sim      - 是否使用模拟点云 (默认 true)
+         mode     - auto (自动执行) / interactive (交互模式)
+         place_x  - 放置位置 X (默认 -0.15)
+         place_y  - 放置位置 Y (默认 0.05)
+         place_z  - 放置位置 Z (默认 0.02)
+  -->
+
+  <arg name="sim" default="true"/>
+  <arg name="mode" default="auto"/>
+  <arg name="place_x" default="-0.15"/>
+  <arg name="place_y" default="0.05"/>
+  <arg name="place_z" default="0.02"/>
+
+  <!-- 启动 MoveIt demo (含 move_group, rviz, robot_state_publisher) -->
+  <include file="$(find armpi_fpv_moveit_config)/launch/move_group.launch">
+    <arg name="allow_trajectory_execution" value="true"/>
+    <arg name="fake_execution" value="true"/>
+    <arg name="info" value="true"/>
+    <arg name="debug" value="false"/>
+    <arg name="pipeline" value="ompl"/>
+    <arg name="load_robot_description" value="true"/>
+  </include>
+
+  <!-- joint_state_publisher 使用 fake controller 的关节状态 -->
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+    <rosparam param="source_list">[move_group/fake_controller_joint_states]</rosparam>
+  </node>
+
+  <!-- robot_state_publisher -->
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="true" output="screen"/>
+
+  <!-- RViz -->
+  <include file="$(find armpi_fpv_moveit_config)/launch/moveit_rviz.launch">
+    <arg name="rviz_config" value="$(find armpi_fpv_moveit_config)/launch/moveit.rviz"/>
+    <arg name="debug" value="false"/>
+  </include>
+
+  <!-- 加载场景 -->
+  <node name="moveit_publish_scene_from_text" pkg="moveit_ros_planning" type="moveit_publish_scene_from_text"
+        args="$(find armpi_fpv_moveit_config)/config/shelf.scene"/>
+
+  <!-- 静态 TF: world_frame -> base_link -->
+  <node pkg="tf2_ros" type="static_transform_publisher" name="world_to_base_link_broadcaster"
+        args="0 0 0 0 0 0 1 world_frame base_link"/>
+
+  <!-- 静态 TF: base_link -> camera_depth_optical_frame
+       相机在机器人上方 50cm, 朝下拍摄
+       旋转: 绕 Y 轴 180 度 => 四元数 (0, 1, 0, 0)
+  -->
+  <node pkg="tf2_ros" type="static_transform_publisher" name="camera_depth_optical_frame_broadcaster"
+        args="0 0 0.50 0 1 0 0 base_link camera_depth_optical_frame"/>
+
+  <!-- 模拟点云发布器 -->
+  <node if="$(arg sim)" pkg="armpi_fpv_moveit_config" type="fake_point_cloud.py"
+        name="fake_point_cloud" output="screen">
+    <param name="cloud_topic" value="/camera/depth/points"/>
+    <param name="cloud_frame" value="camera_depth_optical_frame"/>
+    <param name="publish_rate" value="1.0"/>
+    <param name="table/z" value="0.49"/>
+    <param name="table/cx" value="0.0"/>
+    <param name="table/cy" value="0.0"/>
+    <param name="table/size_x" value="0.5"/>
+    <param name="table/size_y" value="0.4"/>
+    <param name="box1/x" value="0.0"/>
+    <param name="box1/y" value="0.02"/>
+    <param name="box1/z" value="0.44"/>
+    <param name="box1/sx" value="0.03"/>
+    <param name="box1/sy" value="0.03"/>
+    <param name="box1/sz" value="0.04"/>
+    <param name="box2/x" value="0.05"/>
+    <param name="box2/y" value="0.02"/>
+    <param name="box2/z" value="0.445"/>
+    <param name="box2/sx" value="0.04"/>
+    <param name="box2/sy" value="0.025"/>
+    <param name="box2/sz" value="0.035"/>
+  </node>
+
+  <!-- 点云抓取节点 -->
+  <node pkg="armpi_fpv_moveit_config" type="pointcloud_grasp.py"
+        name="pointcloud_grasper" output="screen">
+    <param name="mode" value="$(arg mode)"/>
+    <param name="cloud_topic" value="/camera/depth/points"/>
+    <param name="place_x" value="$(arg place_x)"/>
+    <param name="place_y" value="$(arg place_y)"/>
+    <param name="place_z" value="$(arg place_z)"/>
+  </node>
+
+</launch>

@@ -1,0 +1,2 @@
+set(warehouse_MESSAGE_FILES "/home/armpi/桌面/ros/armpi_fpv/src/warehouse/msg/Rotate.msg;/home/armpi/桌面/ros/armpi_fpv/src/warehouse/msg/Pose.msg;/home/armpi/桌面/ros/armpi_fpv/src/warehouse/msg/Grasp.msg")
+set(warehouse_SERVICE_FILES "/home/armpi/桌面/ros/armpi_fpv/src/warehouse/srv/SetInTarget.srv;/home/armpi/桌面/ros/armpi_fpv/src/warehouse/srv/SetOutTarget.srv;/home/armpi/桌面/ros/armpi_fpv/src/warehouse/srv/SetExchangeTarget.srv")

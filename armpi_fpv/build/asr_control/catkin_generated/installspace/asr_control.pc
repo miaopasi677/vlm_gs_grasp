@@ -1,0 +1,8 @@
+prefix=/home/armpi/桌面/ros/armpi_fpv/install
+
+Name: asr_control
+Description: Description of asr_control
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

@@ -1,0 +1,8 @@
+prefix=/home/armpi/桌面/ros/armpi_fpv/devel
+
+Name: object_pallezting
+Description: Description of object_pallezting
+Version: 0.0.0
+Cflags: -I/home/armpi/桌面/ros/armpi_fpv/devel/include
+Libs: -L${prefix}/lib 
+Requires: std_msgs std_srvs

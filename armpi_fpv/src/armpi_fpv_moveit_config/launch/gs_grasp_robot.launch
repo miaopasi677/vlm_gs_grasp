@@ -1,0 +1,91 @@
+<launch>
+  <!-- 3DGS 抓取 - 远程控制机器人真机
+
+       前提: 机器人 192.168.2.46 上已运行:
+         roscore
+         roslaunch hiwonder_servo_controllers start.launch
+
+       使用方式:
+         source setup_ros_robot.sh
+         roslaunch armpi_fpv_moveit_config gs_grasp_robot.launch
+         roslaunch armpi_fpv_moveit_config gs_grasp_robot.launch gs_ply:=/path/to/other.ply
+
+       参数:
+         gs_ply       - 3DGS导出的ply文件路径
+         scale        - 场景到米的缩放因子
+         auto_table   - 自动检测桌面高度
+         transform    - 4x4坐标变换矩阵
+         place_x/y    - 放置位置
+         mode         - interactive 或 auto
+         roi_xy_max   - 可达范围过滤
+         dark_thresh  - 暗色过滤阈值
+  -->
+
+  <!-- ply 文件路径 -->
+  <arg name="gs_ply" default="/home/armpi/桌面/ros/point_cloud.ply" doc="3DGS导出的ply文件路径"/>
+
+  <!-- 坐标变换参数 -->
+  <arg name="scale" default="1.0" doc="场景到米的缩放因子"/>
+  <arg name="auto_table" default="true" doc="自动检测桌面高度"/>
+  <arg name="transform" default="1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1"/>
+
+  <!-- 放置位置 -->
+  <arg name="place_x" default="-0.15"/>
+  <arg name="place_y" default="0.05"/>
+
+  <!-- 点云处理 -->
+  <arg name="roi_xy_max" default="0.35" doc="ROI: 保留距base_link中心多远的点"/>
+  <arg name="dark_thresh" default="30" doc="暗色过滤阈值"/>
+
+  <!-- 交互模式 -->
+  <arg name="mode" default="interactive" doc="interactive 或 auto"/>
+  <arg name="use_rviz" default="true" doc="是否启动 RViz"/>
+
+  <!-- VLM 自然语言选物 (OpenAI 兼容 API) -->
+  <arg name="vlm_enabled" default="false"/>
+  <arg name="vlm_api_base" default="https://api.openai.com/v1"/>
+  <arg name="vlm_api_key" default=""/>
+  <arg name="vlm_model" default="gpt-4o-mini"/>
+  <arg name="vlm_use_camera" default="true"/>
+  <arg name="vlm_camera_topic" default="/usb_cam/image_raw"/>
+
+  <!-- MoveIt: 本机运行 move_group，通过 ROS 网络向机器人发送轨迹 -->
+  <include file="$(find armpi_fpv_moveit_config)/launch/move_group.launch">
+    <arg name="allow_trajectory_execution" value="true"/>
+    <arg name="fake_execution" value="false"/>
+    <arg name="info" value="true"/>
+    <arg name="debug" value="false"/>
+    <arg name="pipeline" value="ompl"/>
+    <arg name="load_robot_description" value="true"/>
+  </include>
+
+  <!-- 机器人端 hiwonder_joint_states_publisher 已发布 /joint_states，无需再起 joint_state_publisher -->
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="true" output="screen" />
+
+  <include file="$(find armpi_fpv_moveit_config)/launch/moveit_rviz.launch" if="$(arg use_rviz)">
+    <arg name="rviz_config" value="$(find armpi_fpv_moveit_config)/launch/moveit.rviz"/>
+    <arg name="debug" value="false"/>
+  </include>
+
+  <!-- GS 抓取节点 (使用系统 Python，避免 conda 环境缺 ROS 依赖) -->
+  <node pkg="armpi_fpv_moveit_config" type="gs_grasp_sim.py"
+        name="gs_grasp_sim" output="screen"
+        launch-prefix="/usr/bin/python3">
+    <param name="gs_ply" value="$(arg gs_ply)"/>
+    <param name="scale" value="$(arg scale)"/>
+    <param name="auto_table" value="$(arg auto_table)"/>
+    <param name="transform" value="$(arg transform)"/>
+    <param name="place_x" value="$(arg place_x)"/>
+    <param name="place_y" value="$(arg place_y)"/>
+    <param name="mode" value="$(arg mode)"/>
+    <param name="roi_xy_max" value="$(arg roi_xy_max)"/>
+    <param name="dark_thresh" value="$(arg dark_thresh)"/>
+    <param name="vlm/enabled" value="$(arg vlm_enabled)"/>
+    <param name="vlm/api_base" value="$(arg vlm_api_base)"/>
+    <param name="vlm/api_key" value="$(arg vlm_api_key)"/>
+    <param name="vlm/model" value="$(arg vlm_model)"/>
+    <param name="vlm/use_camera" value="$(arg vlm_use_camera)"/>
+    <param name="vlm/camera_topic" value="$(arg vlm_camera_topic)"/>
+  </node>
+
+</launch>

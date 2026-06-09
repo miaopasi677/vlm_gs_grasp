@@ -1,0 +1,60 @@
+<launch>
+  <!-- Launch MoveIt demo with fake point cloud for Octomap visualization in RViz.
+
+       Usage:
+         roslaunch armpi_fpv_moveit_config demo_with_pointcloud.launch
+         roslaunch armpi_fpv_moveit_config demo_with_pointcloud.launch fake_execution:=true
+  -->
+
+  <arg name="fake_execution" default="true"/>
+
+  <!-- Start the MoveIt demo (includes move_group, rviz, robot_state_publisher) -->
+  <include file="$(find armpi_fpv_moveit_config)/launch/demo.launch">
+    <arg name="use_gui" value="false"/>
+    <arg name="fake_execution" value="$(arg fake_execution)"/>
+  </include>
+
+  <!-- Static TF: world_frame -> base_link (required by virtual joint in SRDF) -->
+  <node pkg="tf2_ros" type="static_transform_publisher" name="world_to_base_link_broadcaster"
+        args="0 0 0 0 0 0 1 world_frame base_link"/>
+
+  <!-- Static TF: camera_depth_optical_frame relative to base_link
+       Simulates a depth camera on a tripod 50cm above the robot, looking straight down.
+       Position: (0, 0, 0.50)
+       Rotation: 180 deg about Y axis => quaternion (0, 1, 0, 0)
+         - optical Z (forward) -> base -Z (down toward table)
+         - optical X (right)   -> base -X (backward)
+         - optical Y (down)    -> base  Y (left)
+       Args format: x y z qx qy qz qw parent child
+  -->
+  <node pkg="tf2_ros" type="static_transform_publisher" name="camera_depth_optical_frame_broadcaster"
+        args="0 0 0.50 0 1 0 0 base_link camera_depth_optical_frame"/>
+
+  <!-- Fake point cloud publisher node -->
+  <node pkg="armpi_fpv_moveit_config" type="fake_point_cloud.py" name="fake_point_cloud" output="screen">
+    <param name="cloud_topic" value="/camera/depth/points"/>
+    <param name="cloud_frame" value="camera_depth_optical_frame"/>
+    <param name="publish_rate" value="1.0"/>
+    <!-- Table: Z=0.49 in optical frame = ~1cm height in base_link -->
+    <param name="table/z" value="0.49"/>
+    <param name="table/cx" value="0.0"/>
+    <param name="table/cy" value="0.0"/>
+    <param name="table/size_x" value="0.5"/>
+    <param name="table/size_y" value="0.4"/>
+    <!-- Box 1: small cube, Z=0.44 in optical = ~6cm above table in base -->
+    <param name="box1/x" value="0.0"/>
+    <param name="box1/y" value="0.02"/>
+    <param name="box1/z" value="0.44"/>
+    <param name="box1/sx" value="0.03"/>
+    <param name="box1/sy" value="0.03"/>
+    <param name="box1/sz" value="0.04"/>
+    <!-- Box 2: another object nearby -->
+    <param name="box2/x" value="0.05"/>
+    <param name="box2/y" value="0.02"/>
+    <param name="box2/z" value="0.445"/>
+    <param name="box2/sx" value="0.04"/>
+    <param name="box2/sy" value="0.025"/>
+    <param name="box2/sz" value="0.035"/>
+  </node>
+
+</launch>

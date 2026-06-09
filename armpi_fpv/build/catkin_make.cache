@@ -1,0 +1,2 @@
+armpi_fpv:armpi_fpv_moveit_config
+-DCATKIN_DEVEL_PREFIX=/home/armpi/桌面/ros/armpi_fpv/devel -DCMAKE_INSTALL_PREFIX=/home/armpi/桌面/ros/armpi_fpv/install -DCATKIN_WHITELIST_PACKAGES=armpi_fpv;armpi_fpv_moveit_config -G Unix Makefiles

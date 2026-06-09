@@ -1,0 +1,5 @@
+armpi_control
+/home/ubuntu/armpi_fpv/devel/.private/armpi_control/cmake.lock /home/ubuntu/armpi_fpv/devel/./cmake.lock
+/home/ubuntu/armpi_fpv/devel/.private/armpi_control/lib/pkgconfig/armpi_control.pc /home/ubuntu/armpi_fpv/devel/lib/pkgconfig/armpi_control.pc
+/home/ubuntu/armpi_fpv/devel/.private/armpi_control/share/armpi_control/cmake/armpi_controlConfig-version.cmake /home/ubuntu/armpi_fpv/devel/share/armpi_control/cmake/armpi_controlConfig-version.cmake
+/home/ubuntu/armpi_fpv/devel/.private/armpi_control/share/armpi_control/cmake/armpi_controlConfig.cmake /home/ubuntu/armpi_fpv/devel/share/armpi_control/cmake/armpi_controlConfig.cmake

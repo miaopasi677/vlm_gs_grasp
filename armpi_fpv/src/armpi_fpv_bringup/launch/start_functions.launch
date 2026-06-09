@@ -1,0 +1,11 @@
+<launch>
+  <node name="object_sorting" pkg="object_sorting" type="sorting.py" required="true" output="screen" />
+  <node name="object_tracking" pkg="object_tracking" type="tracking.py" required="true" output="screen" />
+  <node name="object_pallezting" pkg="object_pallezting" type="pallezting.py" required="true" output="screen" />
+
+  <node name="face_detect" pkg="face_detect" type="face.py" required="true" output="screen" />
+
+  <node name="in" pkg="warehouse" type="in.py" required="true" output="screen" />
+  <node name="out" pkg="warehouse" type="out.py" required="true" output="screen" />
+  <node name="exchange" pkg="warehouse" type="exchange.py" required="true" output="screen" />
+</launch>

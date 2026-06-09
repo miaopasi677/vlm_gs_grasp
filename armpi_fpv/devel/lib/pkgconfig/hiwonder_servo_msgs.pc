@@ -1,0 +1,8 @@
+prefix=/home/armpi/桌面/ros/armpi_fpv/devel
+
+Name: hiwonder_servo_msgs
+Description: Description of hiwonder_servo_msgs
+Version: 0.0.0
+Cflags: -I/home/armpi/桌面/ros/armpi_fpv/devel/include
+Libs: -L${prefix}/lib 
+Requires: message_runtime std_msgs actionlib_msgs

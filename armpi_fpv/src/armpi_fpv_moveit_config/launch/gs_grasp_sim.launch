@@ -1,0 +1,61 @@
+<launch>
+  <!-- 3DGS 抓取仿真: 加载3DGS模型 + MoveIt仿真抓取
+
+       使用方式:
+         roslaunch armpi_fpv_moveit_config gs_grasp_sim.launch
+         roslaunch armpi_fpv_moveit_config gs_grasp_sim.launch gs_ply:=/path/to/other.ply
+         roslaunch armpi_fpv_moveit_config gs_grasp_sim.launch mode:=auto
+
+       参数:
+         gs_ply       - 3DGS导出的ply文件路径
+         scale        - 场景到米的缩放因子 (默认1.0, nerfstudio导出通常是米)
+         auto_table   - 自动检测桌面高度并偏移Z (默认true)
+         transform    - 4x4坐标变换矩阵, 逗号分隔 (默认单位矩阵, auto_table会设置Z偏移)
+         place_x/y    - 放置位置
+         mode         - interactive 或 auto
+         roi_xy_max   - 机械臂可达范围过滤 (默认0.30m)
+         dark_thresh  - 暗色过滤阈值 (默认50, 0=不过滤)
+  -->
+
+  <!-- ply 文件路径 -->
+  <arg name="gs_ply" default="/home/armpi/桌面/ros/point_cloud.ply" doc="3DGS导出的ply文件路径"/>
+
+  <!-- 坐标变换参数 -->
+  <arg name="scale" default="1.0" doc="场景到米的缩放因子"/>
+  <arg name="auto_table" default="true" doc="自动检测桌面高度"/>
+  <!-- 4x4变换矩阵, 逗号分隔 (默认单位矩阵, auto_table会自动设置Z偏移) -->
+  <arg name="transform" default="1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1"/>
+
+  <!-- 放置位置 -->
+  <arg name="place_x" default="-0.15"/>
+  <arg name="place_y" default="0.05"/>
+
+  <!-- 点云处理 -->
+  <arg name="roi_xy_max" default="0.35" doc="ROI: 保留距base_link中心多远的点"/>
+  <arg name="dark_thresh" default="30" doc="暗色过滤阈值 (RGB max < 此值视为暗色)"/>
+
+  <!-- 交互模式 -->
+  <arg name="mode" default="interactive" doc="interactive 或 auto"/>
+
+  <!-- 启动 MoveIt demo (fake execution) -->
+  <include file="$(find armpi_fpv_moveit_config)/launch/demo.launch">
+    <arg name="fake_execution" value="true"/>
+    <arg name="use_rviz" value="true"/>
+  </include>
+
+  <!-- GS 抓取仿真节点 -->
+  <node pkg="armpi_fpv_moveit_config" type="gs_grasp_sim.py"
+        name="gs_grasp_sim" output="screen"
+        launch-prefix="xterm -e" >
+    <param name="gs_ply" value="$(arg gs_ply)"/>
+    <param name="scale" value="$(arg scale)"/>
+    <param name="auto_table" value="$(arg auto_table)"/>
+    <param name="transform" value="$(arg transform)"/>
+    <param name="place_x" value="$(arg place_x)"/>
+    <param name="place_y" value="$(arg place_y)"/>
+    <param name="mode" value="$(arg mode)"/>
+    <param name="roi_xy_max" value="$(arg roi_xy_max)"/>
+    <param name="dark_thresh" value="$(arg dark_thresh)"/>
+  </node>
+
+</launch>

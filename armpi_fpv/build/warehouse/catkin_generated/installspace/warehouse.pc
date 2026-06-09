@@ -1,0 +1,8 @@
+prefix=/home/armpi/桌面/ros/armpi_fpv/install
+
+Name: warehouse
+Description: Description of warehouse
+Version: 0.0.0
+Cflags: -I${prefix}/include
+Libs: -L${prefix}/lib 
+Requires: std_msgs std_srvs geometry_msgs

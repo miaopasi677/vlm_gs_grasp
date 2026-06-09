@@ -1,0 +1,11 @@
+#mode: "client"
+#ap_mode:
+#  ssid: "hiwonder"
+#  band: 5
+#  channel: 149
+#  password: "123456789"
+#  gateway: "192.168.149.1"
+#client_mode:
+#  ssid: "LH_5G"
+#  password: "lehuansuoer3"
+#  timeout: 30

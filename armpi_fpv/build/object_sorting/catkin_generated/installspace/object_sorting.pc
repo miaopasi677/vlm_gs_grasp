@@ -1,0 +1,8 @@
+prefix=/home/armpi/桌面/ros/armpi_fpv/install
+
+Name: object_sorting
+Description: Description of object_sorting
+Version: 0.0.0
+Cflags: -I${prefix}/include
+Libs: -L${prefix}/lib 
+Requires: std_msgs std_srvs
